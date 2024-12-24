@@ -1,26 +1,15 @@
 import { redirect } from 'next/navigation'
 
-import { Expense, storeExpense } from '@/lib/budget'
+import { expenseSchema, storeExpense } from '@/lib/expense'
 
 export function addExpense(formData: FormData): void {
-  const category = formData.get('category')
-  const name = formData.get('name')
-  const amount = Number(formData.get('amount'))
+  const expense = expenseSchema.parse({
+    category: formData.get('category'),
+    name: formData.get('name'),
+    amount: formData.get('amount'),
+  })
 
-  if (
-    !(typeof category === 'string') ||
-    !(typeof name === 'string') ||
-    amount < 0 ||
-    !['needs', 'wants'].includes(category)
-  ) {
-    return
-  }
-
-  storeExpense({
-    category,
-    name,
-    amount,
-  } as Expense)
+  storeExpense(expense)
 
   redirect('/')
 }

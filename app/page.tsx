@@ -5,17 +5,9 @@ import { BsX } from 'react-icons/bs'
 
 import { addExpense } from '@/actions/add-expense'
 import { sendFeedback } from '@/actions/send-feedback'
-import {
-  Budget,
-  Expense,
-  computeBudget,
-  deleteExpense,
-  fetchExpenses,
-  fetchIncome,
-  filterExpenses,
-  storeIncome,
-  sumExpenses,
-} from '@/lib/budget'
+import { Budget, computeBudget } from '@/lib/budget'
+import { Expense, deleteExpense, fetchExpenses, filterExpenses, sumExpenses } from '@/lib/expense'
+import { fetchIncome, storeIncome } from '@/lib/income'
 
 import BudgetCard from '../components/BudgetCard'
 
