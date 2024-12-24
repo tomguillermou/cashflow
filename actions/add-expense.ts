@@ -6,7 +6,7 @@ export function addExpense(formData: FormData): void {
   const expense = expenseSchema.parse({
     category: formData.get('category'),
     name: formData.get('name'),
-    amount: formData.get('amount'),
+    amount: Number(formData.get('amount')),
   })
 
   storeExpense(expense)
