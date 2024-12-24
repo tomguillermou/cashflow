@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-import { storeExpense } from '@/lib/budget'
+import { Expense, storeExpense } from '@/lib/budget'
 
 export function addExpense(formData: FormData): void {
   const category = formData.get('category')
@@ -20,7 +20,7 @@ export function addExpense(formData: FormData): void {
     category,
     name,
     amount,
-  })
+  } as Expense)
 
   redirect('/')
 }
