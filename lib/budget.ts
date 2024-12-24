@@ -47,8 +47,10 @@ export function deleteExpense(name: string): void {
   localStorage.setItem('expenses', JSON.stringify(expenses))
 }
 
-export function computeExpensesByCategory(category: Expense['category']): number {
-  return fetchExpenses()
-    .filter((expense) => expense.category === category)
-    .reduce((total, expense) => total + expense.amount, 0)
+export function sumExpenses(expenses: Expense[]): number {
+  return expenses.reduce((total, expense) => total + expense.amount, 0)
+}
+
+export function filterExpenses(expenses: Expense[], category: Expense['category']): Expense[] {
+  return expenses.filter((expense) => expense.category === category)
 }

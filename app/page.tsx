@@ -8,11 +8,12 @@ import {
   Budget,
   Expense,
   computeBudget,
-  computeExpensesByCategory,
   deleteExpense,
   fetchExpenses,
   fetchIncome,
+  filterExpenses,
   storeIncome,
+  sumExpenses,
 } from '@/lib/budget'
 
 import BudgetCard from './components/BudgetCard'
@@ -20,19 +21,24 @@ import BudgetCard from './components/BudgetCard'
 export default function Home() {
   const [income, setIncome] = useState<number>(0)
   const [expenses, setExpenses] = useState<Expense[]>([])
-  const [needsExpenses, setNeedsExpenses] = useState<number>(0)
-  const [wantsExpenses, setWantsExpenses] = useState<number>(0)
+  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([])
+
   const [budget, setBudget] = useState<Budget | null>(null)
 
   useEffect(() => {
     const income = fetchIncome()
+    const expenses = fetchExpenses()
 
     setIncome(income)
-    setBudget(computeBudget(income))
-    updateExpenses()
+    setExpenses(expenses)
+    setFilteredExpenses(expenses)
   }, [])
 
-  if (!budget) return
+  useEffect(() => {
+    const budget = computeBudget(income)
+
+    setBudget(budget)
+  }, [income])
 
   function onIncomeChange(event: ChangeEvent<HTMLInputElement>): void {
     const income = Number(event.target.value)
@@ -50,14 +56,19 @@ export default function Home() {
 
   function onDeleteExpense(name: string): void {
     deleteExpense(name)
-    updateExpenses()
   }
 
-  function updateExpenses(): void {
-    setExpenses(fetchExpenses())
-    setNeedsExpenses(computeExpensesByCategory('needs'))
-    setWantsExpenses(computeExpensesByCategory('wants'))
+  function onViewAllExpenses(): void {
+    setFilteredExpenses(expenses)
   }
+
+  function onFilterExpenses(category: Expense['category']): void {
+    const filteredExpenses = fetchExpenses().filter((expense) => expense.category === category)
+
+    setFilteredExpenses(filteredExpenses)
+  }
+
+  if (!budget) return
 
   return (
     <main className='flex flex-col p-8'>
@@ -97,17 +108,23 @@ export default function Home() {
         <div className='stats rounded-box border shadow'>
           <div className='stat'>
             <div className='stat-title'>Needs</div>
-            <div className='stat-value'>{needsExpenses.toLocaleString()} €</div>
+            <div className='stat-value'>
+              {sumExpenses(filterExpenses(expenses, 'needs')).toLocaleString()} €
+            </div>
             <div className='stat-desc'>
-              {(budget.needs - needsExpenses).toLocaleString()} € can be spent
+              {(budget.needs - sumExpenses(filterExpenses(expenses, 'needs'))).toLocaleString()} €
+              left in the budget
             </div>
           </div>
 
           <div className='stat'>
             <div className='stat-title'>Wants</div>
-            <div className='stat-value'>{wantsExpenses.toLocaleString()} €</div>
+            <div className='stat-value'>
+              {sumExpenses(filterExpenses(expenses, 'wants')).toLocaleString()} €
+            </div>
             <div className='stat-desc'>
-              {(budget.wants - wantsExpenses).toLocaleString()} € can be spent
+              {(budget.wants - sumExpenses(filterExpenses(expenses, 'wants'))).toLocaleString()} €
+              left in the budget
             </div>
           </div>
         </div>
@@ -116,8 +133,33 @@ export default function Home() {
           Add recurring expense
         </button>
 
+        <div className='flex gap-4 mt-6'>
+          <label className='inline-flex items-center gap-2' onClick={onViewAllExpenses}>
+            <input
+              type='radio'
+              name='view'
+              value='all'
+              className='radio radio-primary'
+              defaultChecked
+            />
+            <span>All</span>
+          </label>
+          <label
+            className='inline-flex items-center gap-2'
+            onClick={onFilterExpenses.bind(null, 'needs')}>
+            <input type='radio' name='view' value='needs' className='radio radio-primary' />
+            <span>Needs</span>
+          </label>
+          <label
+            className='inline-flex items-center gap-2'
+            onClick={onFilterExpenses.bind(null, 'wants')}>
+            <input type='radio' name='view' value='wants' className='radio radio-primary' />
+            <span>Wants</span>
+          </label>
+        </div>
+
         <ul className='flex flex-col gap-4'>
-          {expenses.map((expense, index) => (
+          {filteredExpenses.map((expense, index) => (
             <li key={index} className={`flex items-center p-4 rounded-box border shadow`}>
               <p className='font-bold'>{expense.name}</p>
               <p className='badge ml-2'>{expense.category}</p>
