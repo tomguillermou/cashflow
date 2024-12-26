@@ -14,6 +14,7 @@ export default function BudgetCard({ title, income, ratio, spent }: BudgetCardPr
 
       <div
         className='radial-progress text-primary'
+        // @ts-expect-error --value is used by DaisyUI
         style={{ '--value': spentPercentage }}
         role='progressbar'>
         <p className='text-base-content text-lg font-bold'>{formatPercentage(spentPercentage)}</p>
