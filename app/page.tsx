@@ -3,9 +3,8 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import { BsX } from 'react-icons/bs'
 
-import { addExpense } from '@/actions/add-expense'
-import { sendFeedback } from '@/actions/send-feedback'
-import { Budget, computeBudget } from '@/lib/budget'
+import ExpenseForm from '@/components/ExpenseForm'
+import FeedbackButton from '@/components/FeedbackButton'
 import { Expense, deleteExpense, fetchExpenses, filterExpenses, sumExpenses } from '@/lib/expense'
 import { fetchIncome, storeIncome } from '@/lib/income'
 
@@ -16,240 +15,116 @@ export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([])
 
-  const [budget, setBudget] = useState<Budget | null>(null)
-
   useEffect(() => {
     const income = fetchIncome()
     const expenses = fetchExpenses()
 
     setIncome(income)
     setExpenses(expenses)
-    setFilteredExpenses(expenses)
   }, [])
 
   useEffect(() => {
-    const budget = computeBudget(income)
-
-    setBudget(budget)
-  }, [income])
+    setFilteredExpenses(expenses)
+  }, [expenses])
 
   function onIncomeChange(event: ChangeEvent<HTMLInputElement>): void {
     const income = Number(event.target.value)
-    const budget = computeBudget(income)
 
     storeIncome(income)
     setIncome(income)
-    setBudget(budget)
   }
 
-  function onSendFeedback(): void {
-    const feedbackModal = document.getElementById('feedbackModal') as HTMLDialogElement
-    feedbackModal.showModal()
+  function onDeleteExpense(index: number): void {
+    deleteExpense(index)
+
+    setExpenses(fetchExpenses())
   }
 
-  function onAddExpense(): void {
-    const expenseModal = document.getElementById('expenseModal') as HTMLDialogElement
-    expenseModal.showModal()
-  }
+  function onFilterExpenses(event: ChangeEvent<HTMLSelectElement>): void {
+    let filteredExpenses: Expense[]
 
-  function onDeleteExpense(name: string): void {
-    deleteExpense(name)
-  }
-
-  function onViewAllExpenses(): void {
-    setFilteredExpenses(expenses)
-  }
-
-  function onFilterExpenses(category: Expense['category']): void {
-    const filteredExpenses = fetchExpenses().filter((expense) => expense.category === category)
+    if (
+      event.target.value === 'needs' ||
+      event.target.value === 'wants' ||
+      event.target.value === 'savings'
+    ) {
+      filteredExpenses = filterExpenses(expenses, event.target.value)
+    } else {
+      filteredExpenses = [...expenses]
+    }
 
     setFilteredExpenses(filteredExpenses)
   }
 
-  if (!budget) return
-
   return (
-    <main className='flex flex-col p-8 mx-auto max-w-lg'>
+    <main className='flex flex-col p-8 gap-8 mx-auto max-w-xl'>
       <div className='flex justify-between items-center'>
         <h1 className='text-5xl font-bold'>Cashflow</h1>
-        <button className='btn' onClick={onSendFeedback}>
-          Feedback
-        </button>
+
+        <FeedbackButton />
       </div>
 
-      <p className='text-lg mt-8'>Manage your budget using the 50/30/20 rule.</p>
-
-      <section className='flex flex-col gap-4'>
-        <h2 className='text-3xl mt-8'>Budget</h2>
-
-        <div className='flex flex-col p-6 gap-4 rounded-box border shadow'>
-          <label className='font-bold'>Income</label>
-          <div className='input input-bordered flex items-center'>
-            <input type='text' className='grow' onChange={onIncomeChange} value={income} />
-            <span>€</span>
-          </div>
-        </div>
-
-        <BudgetCard
-          title='Needs'
-          value={budget.needs}
-          tooltip='These are essential expenses for your daily life, such as rent, energy bills, phone bill, transportation, groceries, insurance, etc.'
+      <div className='flex flex-col p-6 gap-4 rounded-box border shadow bg-base-100'>
+        <label className='font-bold'>Monthly Income</label>
+        <input
+          type='text'
+          className='input input-bordered'
+          onChange={onIncomeChange}
+          value={income}
         />
-        <BudgetCard
-          title='Wants'
-          value={budget.wants}
-          tooltip='These are non-essential expenses related to your leisure activites, such as restaurants, vacations, subscriptions (Netflix, Spotify, etc.), shopping, etc.'
-        />
-        <BudgetCard
-          title='Savings'
-          value={budget.savings}
-          tooltip='This is the amount you set aside for unforeseen expenses, investments, or loan repayments.'
-        />
-      </section>
+      </div>
 
-      <section className='flex flex-col max-w-lg gap-4 mt-12'>
-        <h2 className='text-3xl'>Recurring expenses</h2>
+      <BudgetCard
+        title='Needs'
+        income={income}
+        ratio={0.5}
+        spent={sumExpenses(filterExpenses(expenses, 'needs'))}
+        tooltip='These are essential expenses for your daily life, such as rent, energy bills, phone bill, transportation, groceries, insurance, etc.'
+      />
+      <BudgetCard
+        title='Wants'
+        income={income}
+        ratio={0.3}
+        spent={sumExpenses(filterExpenses(expenses, 'wants'))}
+        tooltip='These are non-essential expenses related to your leisure activites, such as restaurants, vacations, subscriptions (Netflix, Spotify, etc.), shopping, etc.'
+      />
+      <BudgetCard
+        title='Savings'
+        income={income}
+        ratio={0.2}
+        spent={sumExpenses(filterExpenses(expenses, 'savings'))}
+        tooltip='This is the amount you set aside for unforeseen expenses, investments, or loan repayments.'
+      />
 
-        <div className='stats rounded-box border shadow'>
-          <div className='stat'>
-            <div className='stat-title'>Needs</div>
-            <div className='stat-value'>
-              {sumExpenses(filterExpenses(expenses, 'needs')).toLocaleString()} €
+      <ExpenseForm />
+
+      <div className='flex items-center  mt-6'>
+        <p className='text-2xl font-bold'>Recuring Expenses</p>
+        <select className='select select-bordered ml-auto' onChange={onFilterExpenses}>
+          <option value='all'>All</option>
+          <option value='needs'>Needs</option>
+          <option value='wants'>Wants</option>
+          <option value='savings'>Savings</option>
+        </select>
+      </div>
+
+      <ul className='flex flex-col gap-4'>
+        {filteredExpenses.map((expense, index) => (
+          <li key={index} className={`flex items-center p-4 rounded-box border shadow bg-base-100`}>
+            <p className='font-bold'>{expense.name}</p>
+            <p className='badge ml-2'>{expense.category}</p>
+            <p className='ml-auto'>{expense.amount} €</p>
+
+            <div className='tooltip cursor-pointer ml-2 ' data-tip='Delete'>
+              <BsX className='w-6 h-6 text-error' onClick={onDeleteExpense.bind(null, index)} />
             </div>
-            <div className='stat-desc'>
-              {(budget.needs - sumExpenses(filterExpenses(expenses, 'needs'))).toLocaleString()} €
-              left in the budget
-            </div>
-          </div>
-
-          <div className='stat'>
-            <div className='stat-title'>Wants</div>
-            <div className='stat-value'>
-              {sumExpenses(filterExpenses(expenses, 'wants')).toLocaleString()} €
-            </div>
-            <div className='stat-desc'>
-              {(budget.wants - sumExpenses(filterExpenses(expenses, 'wants'))).toLocaleString()} €
-              left in the budget
-            </div>
-          </div>
-        </div>
-
-        <button className='btn btn-primary' onClick={onAddExpense}>
-          Add recurring expense
-        </button>
-
-        <div className='flex gap-4 mt-6'>
-          <label className='inline-flex items-center gap-2' onClick={onViewAllExpenses}>
-            <input
-              type='radio'
-              name='view'
-              value='all'
-              className='radio radio-primary'
-              defaultChecked
-            />
-            <span>All</span>
-          </label>
-          <label
-            className='inline-flex items-center gap-2'
-            onClick={onFilterExpenses.bind(null, 'needs')}>
-            <input type='radio' name='view' value='needs' className='radio radio-primary' />
-            <span>Needs</span>
-          </label>
-          <label
-            className='inline-flex items-center gap-2'
-            onClick={onFilterExpenses.bind(null, 'wants')}>
-            <input type='radio' name='view' value='wants' className='radio radio-primary' />
-            <span>Wants</span>
-          </label>
-        </div>
-
-        <ul className='flex flex-col gap-4'>
-          {filteredExpenses.map((expense, index) => (
-            <li key={index} className={`flex items-center p-4 rounded-box border shadow`}>
-              <p className='font-bold'>{expense.name}</p>
-              <p className='badge ml-2'>{expense.category}</p>
-              <p className='ml-auto'>{expense.amount} €</p>
-              <BsX
-                className='w-6 h-6 text-error cursor-pointer ml-2'
-                onClick={onDeleteExpense.bind(null, expense.name)}
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
+          </li>
+        ))}
+      </ul>
 
       <p className='mt-8 text-sm text-center'>
-        Your data is stored only inside your browser, so only you can access it. No one else can
-        have access not even Cashflow.
+        All your data is stored exclusively in your browser, making it inaccessible to Cashflow.
       </p>
-
-      <dialog id='expenseModal' className='modal'>
-        <form className='modal-box flex flex-col gap-4 max-w-md' action={addExpense}>
-          <div className='flex gap-4'>
-            <p>Category</p>
-            <label className='inline-flex items-center gap-2'>
-              <input type='radio' name='category' value='needs' className='radio' defaultChecked />
-              <span>Needs</span>
-            </label>
-            <label className='inline-flex items-center gap-2'>
-              <input type='radio' name='category' value='wants' className='radio' />
-              <span>Wants</span>
-            </label>
-          </div>
-          <label className='input input-bordered inline-flex items-center gap-2'>
-            <span>Name</span>
-            <input name='name' type='text' className='grow' placeholder='Internet' />
-          </label>
-          <label className='input input-bordered inline-flex items-center gap-2'>
-            <span>Amount</span>
-            <input name='amount' type='text' className='grow' placeholder='19.99' />
-            <span>€</span>
-          </label>
-          <div className='flex justify-end gap-2'>
-            <button type='submit' className='btn btn-primary'>
-              Add expense
-            </button>
-          </div>
-        </form>
-        <form method='dialog' className='modal-backdrop'>
-          <button>close</button>
-        </form>
-      </dialog>
-
-      <dialog id='feedbackModal' className='modal'>
-        <form className='modal-box flex flex-col gap-4 max-w-md' action={sendFeedback}>
-          <div className='flex gap-4'>
-            <label className='inline-flex items-center gap-2'>
-              <input type='radio' name='nature' value='bug' className='radio' defaultChecked />
-              <span>Bug</span>
-            </label>
-            <label className='inline-flex items-center gap-2'>
-              <input type='radio' name='nature' value='feature' className='radio' />
-              <span>Feature</span>
-            </label>
-            <label className='inline-flex items-center gap-2'>
-              <input type='radio' name='nature' value='other' className='radio' />
-              <span>Other</span>
-            </label>
-          </div>
-
-          <textarea
-            name='content'
-            className='textarea textarea-bordered'
-            placeholder='Please type here...'
-            maxLength={400}
-            rows={7}
-            style={{ resize: 'none' }}
-            required></textarea>
-
-          <button type='submit' className='btn btn-primary'>
-            Send feedback
-          </button>
-        </form>
-        <form method='dialog' className='modal-backdrop'>
-          <button>close</button>
-        </form>
-      </dialog>
     </main>
   )
 }
