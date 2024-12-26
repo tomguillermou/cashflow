@@ -99,8 +99,8 @@ export default function Home() {
 
       <ExpenseForm />
 
-      <div className='flex items-center  mt-6'>
-        <p className='text-2xl font-bold'>Recuring Expenses</p>
+      <div className='flex items-center mt-6'>
+        <p className='text-2xl font-bold'>Monthly Expenses</p>
         <select className='select select-bordered ml-auto' onChange={onFilterExpenses}>
           <option value='all'>All</option>
           <option value='needs'>Needs</option>
