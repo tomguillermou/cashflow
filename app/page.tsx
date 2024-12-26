@@ -4,7 +4,6 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { BsX } from 'react-icons/bs'
 
 import ExpenseForm from '@/components/ExpenseForm'
-import FeedbackButton from '@/components/FeedbackButton'
 import { Expense, deleteExpense, fetchExpenses, filterExpenses, sumExpenses } from '@/lib/expense'
 import { fetchIncome, storeIncome } from '@/lib/income'
 
@@ -57,14 +56,14 @@ export default function Home() {
   }
 
   return (
-    <main className='flex flex-col p-8 gap-8 mx-auto max-w-xl'>
-      <div className='flex justify-between items-center'>
-        <h1 className='text-5xl font-bold'>Cashflow</h1>
+    <main className='flex flex-col p-8 gap-8 mx-auto max-w-3xl'>
+      <h1 className='text-5xl font-bold text-center'>Cashflow</h1>
 
-        <FeedbackButton />
-      </div>
+      <p className='text-lg text-center'>
+        Plan your budget. Track recurring expenses. Achieve your financial goals.
+      </p>
 
-      <div className='flex flex-col p-6 gap-4 rounded-box border shadow bg-base-100'>
+      <div className='flex flex-col mt-6 p-6 gap-4 rounded-box border shadow bg-base-100'>
         <label className='font-bold'>Monthly Income</label>
         <input
           type='text'
@@ -74,27 +73,29 @@ export default function Home() {
         />
       </div>
 
-      <BudgetCard
-        title='Needs'
-        income={income}
-        ratio={0.5}
-        spent={sumExpenses(filterExpenses(expenses, 'needs'))}
-        tooltip='These are essential expenses for your daily life, such as rent, energy bills, phone bill, transportation, groceries, insurance, etc.'
-      />
-      <BudgetCard
-        title='Wants'
-        income={income}
-        ratio={0.3}
-        spent={sumExpenses(filterExpenses(expenses, 'wants'))}
-        tooltip='These are non-essential expenses related to your leisure activites, such as restaurants, vacations, subscriptions (Netflix, Spotify, etc.), shopping, etc.'
-      />
-      <BudgetCard
-        title='Savings'
-        income={income}
-        ratio={0.2}
-        spent={sumExpenses(filterExpenses(expenses, 'savings'))}
-        tooltip='This is the amount you set aside for unforeseen expenses, investments, or loan repayments.'
-      />
+      <section className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+        <BudgetCard
+          title='Needs'
+          income={income}
+          ratio={0.5}
+          spent={sumExpenses(filterExpenses(expenses, 'needs'))}
+          tooltip='These are essential expenses for your daily life, such as rent, energy bills, phone bill, transportation, groceries, insurance, etc.'
+        />
+        <BudgetCard
+          title='Wants'
+          income={income}
+          ratio={0.3}
+          spent={sumExpenses(filterExpenses(expenses, 'wants'))}
+          tooltip='These are non-essential expenses related to your leisure activites, such as restaurants, vacations, subscriptions (Netflix, Spotify, etc.), shopping, etc.'
+        />
+        <BudgetCard
+          title='Savings'
+          income={income}
+          ratio={0.2}
+          spent={sumExpenses(filterExpenses(expenses, 'savings'))}
+          tooltip='This is the amount you set aside for unforeseen expenses, investments, or loan repayments.'
+        />
+      </section>
 
       <ExpenseForm />
 

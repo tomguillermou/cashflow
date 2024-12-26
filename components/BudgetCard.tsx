@@ -4,7 +4,7 @@ export default function BudgetCard({ title, income, ratio, spent }: BudgetCardPr
 
   const budget = income * ratio
   const spentPercentage = income ? (spent / (income * ratio)) * 100 : 0
-  const remaining = Math.max(budget - spent, 0)
+  const remaining = budget - spent
 
   return (
     <div className='flex flex-col items-center text-center p-8 gap-6 rounded-box border shadow bg-base-100'>
@@ -26,7 +26,7 @@ export default function BudgetCard({ title, income, ratio, spent }: BudgetCardPr
       </div>
 
       <div>
-        <p className='text-gray-400'>Spent</p>
+        <p className='text-gray-400'>Expenses</p>
         <p className='text-xl font-bold'>{formatEuro(spent)}</p>
       </div>
 
