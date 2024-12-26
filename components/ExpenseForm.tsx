@@ -1,12 +1,46 @@
-import { addExpense } from '@/actions/add-expense'
+import { useState } from 'react'
 
-export default function ExpenseForm() {
+import { Expense, storeExpense, validateExpense } from '@/lib/expense'
+
+interface ExpenseFormProps {
+  onExpenseAdded: (expense: Expense) => void
+}
+
+export default function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
+  const [category, setCategory] = useState('needs')
+  const [name, setName] = useState('')
+  const [amount, setAmount] = useState('')
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const expense = validateExpense({
+      category,
+      name,
+      amount: Number(amount),
+    })
+
+    storeExpense(expense)
+
+    onExpenseAdded(expense)
+
+    setCategory('needs')
+    setName('')
+    setAmount('')
+  }
+
   return (
-    <form className='flex flex-col p-6 rounded-box border shadow bg-base-100' action={addExpense}>
+    <form
+      className='flex flex-col p-6 rounded-box border shadow bg-base-100'
+      onSubmit={handleSubmit}>
       <h2 className='text-2xl font-bold'>Add Expense</h2>
 
       <label className='mt-6 mb-2 font-bold'>Category</label>
-      <select name='category' className='select select-bordered'>
+      <select
+        name='category'
+        className='select select-bordered'
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}>
         <option value='needs'>Needs</option>
         <option value='wants'>Wants</option>
         <option value='savings'>Savings</option>
@@ -18,6 +52,8 @@ export default function ExpenseForm() {
         type='text'
         className='input input-bordered'
         placeholder='Enter description'
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         required
       />
 
@@ -28,6 +64,8 @@ export default function ExpenseForm() {
         className='input input-bordered'
         placeholder='Enter amount'
         step={0.01}
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
         required
       />
 

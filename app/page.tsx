@@ -4,7 +4,14 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { BsX } from 'react-icons/bs'
 
 import ExpenseForm from '@/components/ExpenseForm'
-import { Expense, deleteExpense, fetchExpenses, filterExpenses, sumExpenses } from '@/lib/expense'
+import {
+  Expense,
+  deleteExpense,
+  fetchExpenses,
+  filterExpenses,
+  sortExpenses,
+  sumExpenses,
+} from '@/lib/expense'
 import { fetchIncome, storeIncome } from '@/lib/income'
 
 import BudgetCard from '../components/BudgetCard'
@@ -13,6 +20,7 @@ export default function Home() {
   const [income, setIncome] = useState<number>(0)
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([])
+  const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
   useEffect(() => {
     const income = fetchIncome()
@@ -23,8 +31,16 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    setFilteredExpenses(expenses)
-  }, [expenses])
+    let filteredExpenses: Expense[]
+
+    if (selectedFilter === 'needs' || selectedFilter === 'wants' || selectedFilter === 'savings') {
+      filteredExpenses = filterExpenses(expenses, selectedFilter)
+    } else {
+      filteredExpenses = [...expenses]
+    }
+
+    setFilteredExpenses(filteredExpenses)
+  }, [expenses, selectedFilter])
 
   function onIncomeChange(event: ChangeEvent<HTMLInputElement>): void {
     const income = Number(event.target.value)
@@ -39,20 +55,8 @@ export default function Home() {
     setExpenses(fetchExpenses())
   }
 
-  function onFilterExpenses(event: ChangeEvent<HTMLSelectElement>): void {
-    let filteredExpenses: Expense[]
-
-    if (
-      event.target.value === 'needs' ||
-      event.target.value === 'wants' ||
-      event.target.value === 'savings'
-    ) {
-      filteredExpenses = filterExpenses(expenses, event.target.value)
-    } else {
-      filteredExpenses = [...expenses]
-    }
-
-    setFilteredExpenses(filteredExpenses)
+  function handleExpenseAdded(expense: Expense): void {
+    setExpenses((prevExpenses) => sortExpenses([...prevExpenses, expense]))
   }
 
   return (
@@ -97,11 +101,14 @@ export default function Home() {
         />
       </section>
 
-      <ExpenseForm />
+      <ExpenseForm onExpenseAdded={handleExpenseAdded} />
 
       <div className='flex items-center mt-6'>
         <p className='text-2xl font-bold'>Monthly Expenses</p>
-        <select className='select select-bordered ml-auto' onChange={onFilterExpenses}>
+        <select
+          id='select-filter'
+          className='select select-bordered ml-auto'
+          onChange={(e) => setSelectedFilter(e.target.value)}>
           <option value='all'>All</option>
           <option value='needs'>Needs</option>
           <option value='wants'>Wants</option>
