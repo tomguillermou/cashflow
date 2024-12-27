@@ -4,19 +4,24 @@ import { uuid } from './uuid'
 
 const expenseSchema = z.object({
   id: z.string(),
-  category: z.enum(['needs', 'wants', 'savings']),
   name: z.string(),
   amount: z.number().positive(),
+  category: z.enum(['needs', 'wants', 'savings']),
 })
 
-export type Expense = z.infer<typeof expenseSchema>
+export interface Expense {
+  id: string
+  name: string
+  amount: number
+  category: string
+}
 
 export function createExpense(props: { category: string; name: string; amount: number }): Expense {
-  const id = uuid()
-
   return expenseSchema.parse({
-    ...props,
-    id,
+    id: uuid(),
+    name: props.name,
+    amount: props.amount,
+    category: props.category,
   })
 }
 
@@ -48,6 +53,6 @@ export function sortExpenses(expenses: Expense[]): Expense[] {
   return expenses.sort((a, b) => b.amount - a.amount)
 }
 
-export function filterExpenses(expenses: Expense[], category: Expense['category']): Expense[] {
+export function filterExpensesByCategory(expenses: Expense[], category: string): Expense[] {
   return expenses.filter((expense) => expense.category === category)
 }

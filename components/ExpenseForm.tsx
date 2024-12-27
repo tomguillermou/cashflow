@@ -2,16 +2,12 @@ import { useState } from 'react'
 
 import { Expense, createExpense, storeExpense } from '@/lib/expense'
 
-interface ExpenseFormProps {
-  onExpenseAdded: (expense: Expense) => void
-}
-
 export default function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
   const [category, setCategory] = useState('needs')
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('')
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const expense = createExpense({
@@ -24,6 +20,10 @@ export default function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
 
     onExpenseAdded(expense)
 
+    resetForm()
+  }
+
+  function resetForm() {
     setCategory('needs')
     setName('')
     setAmount('')
@@ -74,4 +74,8 @@ export default function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
       </button>
     </form>
   )
+}
+
+interface ExpenseFormProps {
+  onExpenseAdded: (expense: Expense) => void
 }

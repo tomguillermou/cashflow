@@ -9,8 +9,7 @@ import {
   Expense,
   deleteExpense,
   fetchExpenses,
-  filterExpenses,
-  sortExpenses,
+  filterExpensesByCategory,
   sumExpenses,
 } from '@/lib/expense'
 import { fetchIncome, storeIncome } from '@/lib/income'
@@ -21,47 +20,59 @@ export default function Home() {
   const [income, setIncome] = useState<number>(0)
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([])
-  const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
   useEffect(() => {
-    const income = fetchIncome()
-    const expenses = fetchExpenses()
-
-    setIncome(income)
-    setExpenses(expenses)
+    loadIncome()
+    loadExpenses()
   }, [])
 
-  useEffect(() => {
-    let filteredExpenses: Expense[]
-
-    if (selectedFilter === 'needs' || selectedFilter === 'wants' || selectedFilter === 'savings') {
-      filteredExpenses = filterExpenses(expenses, selectedFilter)
-    } else {
-      filteredExpenses = [...expenses]
-    }
-
-    setFilteredExpenses(filteredExpenses)
-  }, [expenses, selectedFilter])
-
-  function onIncomeChange(event: ChangeEvent<HTMLInputElement>): void {
+  function onIncomeChange(event: ChangeEvent<HTMLInputElement>) {
     const income = Number(event.target.value)
 
+    setIncome(income)
     storeIncome(income)
+  }
+
+  function onFilterExpenses(event: ChangeEvent<HTMLSelectElement>) {
+    const filter = event.target.value
+
+    if (filter === 'needs' || filter === 'wants' || filter === 'savings') {
+      setFilteredExpenses(filterExpensesByCategory(expenses, filter))
+    } else {
+      setFilteredExpenses(expenses)
+    }
+  }
+
+  function onDeleteExpense(expense: Expense) {
+    deleteExpense(expense.id)
+    toast.success(`Deleted ${expense.name} from ${expense.category}`)
+
+    loadExpenses()
+  }
+
+  function onAddExpense(expense: Expense) {
+    toast.success(`Added ${expense.name} to ${expense.category}`)
+
+    loadExpenses()
+  }
+
+  function loadIncome() {
+    const income = fetchIncome()
+
     setIncome(income)
   }
 
-  function onDeleteExpense(id: string): void {
-    deleteExpense(id)
+  function loadExpenses() {
+    const expenses = fetchExpenses()
 
-    setExpenses(fetchExpenses())
+    setExpenses(expenses)
+    setFilteredExpenses(expenses)
 
-    toast.success('Expense deleted')
-  }
+    const filterElement = document.getElementById('filter') as HTMLSelectElement | null
 
-  function handleExpenseAdded(expense: Expense): void {
-    setExpenses((prevExpenses) => sortExpenses([...prevExpenses, expense]))
-
-    toast.success('Expense added')
+    if (filterElement) {
+      filterElement.selectedIndex = 0
+    }
   }
 
   return (
@@ -87,33 +98,34 @@ export default function Home() {
           title='Needs'
           income={income}
           ratio={0.5}
-          spent={sumExpenses(filterExpenses(expenses, 'needs'))}
+          spent={sumExpenses(filterExpensesByCategory(expenses, 'needs'))}
           tooltip='These are essential expenses for your daily life, such as rent, energy bills, phone bill, transportation, groceries, insurance, etc.'
         />
         <BudgetCard
           title='Wants'
           income={income}
           ratio={0.3}
-          spent={sumExpenses(filterExpenses(expenses, 'wants'))}
+          spent={sumExpenses(filterExpensesByCategory(expenses, 'wants'))}
           tooltip='These are non-essential expenses related to your leisure activites, such as restaurants, vacations, subscriptions (Netflix, Spotify, etc.), shopping, etc.'
         />
         <BudgetCard
           title='Savings'
           income={income}
           ratio={0.2}
-          spent={sumExpenses(filterExpenses(expenses, 'savings'))}
+          spent={sumExpenses(filterExpensesByCategory(expenses, 'savings'))}
           tooltip='This is the amount you set aside for unforeseen expenses, investments, or loan repayments.'
         />
       </section>
 
-      <ExpenseForm onExpenseAdded={handleExpenseAdded} />
+      <ExpenseForm onExpenseAdded={onAddExpense} />
 
       <div className='flex items-center mt-6'>
         <p className='text-2xl font-bold'>Monthly Expenses</p>
         <select
-          id='select-filter'
+          id='filter'
           className='select select-bordered ml-auto'
-          onChange={(e) => setSelectedFilter(e.target.value)}>
+          onChange={onFilterExpenses}
+          defaultValue={'all'}>
           <option value='all'>All</option>
           <option value='needs'>Needs</option>
           <option value='wants'>Wants</option>
@@ -129,10 +141,7 @@ export default function Home() {
             <p className='ml-auto'>{expense.amount} €</p>
 
             <div className='tooltip cursor-pointer ml-2 ' data-tip='Delete'>
-              <BsX
-                className='w-6 h-6 text-error'
-                onClick={onDeleteExpense.bind(null, expense.id)}
-              />
+              <BsX className='w-6 h-6 text-error' onClick={onDeleteExpense.bind(null, expense)} />
             </div>
           </li>
         ))}
