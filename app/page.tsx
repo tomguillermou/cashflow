@@ -1,6 +1,7 @@
 'use client'
 
 import { ChangeEvent, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { BsX } from 'react-icons/bs'
 
 import ExpenseForm from '@/components/ExpenseForm'
@@ -53,10 +54,14 @@ export default function Home() {
     deleteExpense(id)
 
     setExpenses(fetchExpenses())
+
+    toast.success('Expense deleted')
   }
 
   function handleExpenseAdded(expense: Expense): void {
     setExpenses((prevExpenses) => sortExpenses([...prevExpenses, expense]))
+
+    toast.success('Expense added')
   }
 
   return (
