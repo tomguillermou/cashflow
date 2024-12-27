@@ -49,8 +49,8 @@ export default function Home() {
     setIncome(income)
   }
 
-  function onDeleteExpense(index: number): void {
-    deleteExpense(index)
+  function onDeleteExpense(id: string): void {
+    deleteExpense(id)
 
     setExpenses(fetchExpenses())
   }
@@ -124,7 +124,10 @@ export default function Home() {
             <p className='ml-auto'>{expense.amount} €</p>
 
             <div className='tooltip cursor-pointer ml-2 ' data-tip='Delete'>
-              <BsX className='w-6 h-6 text-error' onClick={onDeleteExpense.bind(null, index)} />
+              <BsX
+                className='w-6 h-6 text-error'
+                onClick={onDeleteExpense.bind(null, expense.id)}
+              />
             </div>
           </li>
         ))}

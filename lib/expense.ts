@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
+import { uuid } from './uuid'
+
 const expenseSchema = z.object({
+  id: z.string(),
   category: z.enum(['needs', 'wants', 'savings']),
   name: z.string(),
   amount: z.number().positive(),
@@ -8,8 +11,13 @@ const expenseSchema = z.object({
 
 export type Expense = z.infer<typeof expenseSchema>
 
-export function validateExpense(data: unknown): Expense {
-  return expenseSchema.parse(data)
+export function createExpense(props: { category: string; name: string; amount: number }): Expense {
+  const id = uuid()
+
+  return expenseSchema.parse({
+    ...props,
+    id,
+  })
 }
 
 export function storeExpense(expense: Expense): void {
@@ -26,8 +34,8 @@ export function fetchExpenses(): Expense[] {
   return sortExpenses(expenses)
 }
 
-export function deleteExpense(index: number): void {
-  const expenses = fetchExpenses().filter((_, i) => i !== index)
+export function deleteExpense(id: string): void {
+  const expenses = fetchExpenses().filter((expense) => expense.id !== id)
 
   localStorage.setItem('expenses', JSON.stringify(expenses))
 }

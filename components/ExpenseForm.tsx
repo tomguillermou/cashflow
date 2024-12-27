@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Expense, storeExpense, validateExpense } from '@/lib/expense'
+import { Expense, createExpense, storeExpense } from '@/lib/expense'
 
 interface ExpenseFormProps {
   onExpenseAdded: (expense: Expense) => void
@@ -14,7 +14,7 @@ export default function ExpenseForm({ onExpenseAdded }: ExpenseFormProps) {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    const expense = validateExpense({
+    const expense = createExpense({
       category,
       name,
       amount: Number(amount),
