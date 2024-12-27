@@ -69,7 +69,7 @@ export default function Home() {
       <h1 className='text-5xl font-bold text-center'>Cashflow</h1>
 
       <p className='text-lg text-center'>
-        Plan your budget. Track recurring expenses. Achieve your financial goals.
+        Plan your budget. Track monthly expenses. Achieve your financial goals.
       </p>
 
       <div className='flex flex-col mt-6 p-6 gap-4 rounded-box border shadow bg-base-100'>
