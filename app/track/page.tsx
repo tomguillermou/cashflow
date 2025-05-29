@@ -65,7 +65,7 @@ export default function Page() {
           <div key={`${month}-${year}`}>
             <div
               ref={isCurrent ? currentMonthRef : undefined}
-              className={`flex h-52 min-w-32 cursor-pointer flex-col items-center justify-center rounded border text-center shadow ${hasSaved ? "bg-blue-200" : ""}`}
+              className={`flex h-52 min-w-32 cursor-pointer flex-col items-center justify-center rounded border text-center shadow ${hasSaved ? "border-blue-500 bg-blue-200" : ""}`}
               onClick={() => handleMonthClick({ month, year })}
             >
               <input
@@ -88,7 +88,7 @@ export default function Page() {
       </div>
 
       <Link href="/" className="btn">
-        Retour
+        Modifier mon objectif
       </Link>
     </main>
   );

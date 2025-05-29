@@ -25,31 +25,45 @@ export const getYearMonths = (): Month[] => {
 };
 
 export const saveIncome = (income: number): void => {
-  window?.localStorage.setItem("income", income.toString());
+  if (typeof window === "undefined") return;
+
+  localStorage.setItem("income", income.toString());
 };
 
 export const getIncome = (): number => {
-  return Number(window?.localStorage.getItem("income") ?? 0);
+  if (typeof window === "undefined") return 0;
+
+  return Number(localStorage.getItem("income") ?? 0);
 };
 
 export const saveRate = (rate: number): void => {
-  window?.localStorage.setItem("rate", rate.toString());
+  if (typeof window === "undefined") return;
+
+  localStorage.setItem("rate", rate.toString());
 };
 
 export const getRate = (defaultRate: number): number => {
-  return Number(window?.localStorage.getItem("rate") ?? defaultRate);
+  if (typeof window === "undefined") return defaultRate;
+
+  return Number(localStorage.getItem("rate") ?? defaultRate);
 };
 
 export const getTarget = (): number => {
-  return Number(window?.localStorage.getItem("target") ?? 0);
+  if (typeof window === "undefined") return 0;
+
+  return Number(localStorage.getItem("target") ?? 0);
 };
 
 export const saveTarget = (target: number): void => {
-  window?.localStorage.setItem("target", target.toString());
+  if (typeof window === "undefined") return;
+
+  localStorage.setItem("target", target.toString());
 };
 
 export const getSavedMonths = (): Month[] => {
-  const savedMonths = window?.localStorage.getItem("saved-months");
+  if (typeof window === "undefined") return [];
+
+  const savedMonths = localStorage.getItem("saved-months");
 
   if (!savedMonths) return [];
 
@@ -57,7 +71,9 @@ export const getSavedMonths = (): Month[] => {
 };
 
 export const saveMonths = (months: Month[]): void => {
-  window?.localStorage.setItem("saved-months", JSON.stringify(months));
+  if (typeof window === "undefined") return;
+
+  localStorage.setItem("saved-months", JSON.stringify(months));
 };
 
 export const toMoney = (value: string | number): string => {
