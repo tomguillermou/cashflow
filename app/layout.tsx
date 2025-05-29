@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: "Cashflow",
+  title: "Mon Petit Banquier",
 };
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="fr-FR">
       <body>
         <div className="mx-auto max-w-lg p-8 md:px-0">
-          <h1 className="mb-8 text-center text-2xl font-bold">Mon Petit Cochon</h1>
+          <h1 className="mb-8 text-center text-2xl font-bold">Mon Petit Banquier</h1>
 
           {children}
         </div>
