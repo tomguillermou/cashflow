@@ -25,31 +25,31 @@ export const getYearMonths = (): Month[] => {
 };
 
 export const saveIncome = (income: number): void => {
-  localStorage.setItem("income", income.toString());
+  window?.localStorage.setItem("income", income.toString());
 };
 
 export const getIncome = (): number => {
-  return Number(localStorage.getItem("income") ?? 0);
+  return Number(window?.localStorage.getItem("income") ?? 0);
 };
 
 export const saveRate = (rate: number): void => {
-  localStorage.setItem("rate", rate.toString());
+  window?.localStorage.setItem("rate", rate.toString());
 };
 
 export const getRate = (defaultRate: number): number => {
-  return Number(localStorage.getItem("rate") ?? defaultRate);
+  return Number(window?.localStorage.getItem("rate") ?? defaultRate);
 };
 
 export const getTarget = (): number => {
-  return Number(localStorage.getItem("target") ?? 0);
+  return Number(window?.localStorage.getItem("target") ?? 0);
 };
 
 export const saveTarget = (target: number): void => {
-  localStorage.setItem("target", target.toString());
+  window?.localStorage.setItem("target", target.toString());
 };
 
 export const getSavedMonths = (): Month[] => {
-  const savedMonths = localStorage.getItem("saved-months");
+  const savedMonths = window?.localStorage.getItem("saved-months");
 
   if (!savedMonths) return [];
 
@@ -57,7 +57,7 @@ export const getSavedMonths = (): Month[] => {
 };
 
 export const saveMonths = (months: Month[]): void => {
-  localStorage.setItem("saved-months", JSON.stringify(months));
+  window?.localStorage.setItem("saved-months", JSON.stringify(months));
 };
 
 export const toMoney = (value: string | number): string => {

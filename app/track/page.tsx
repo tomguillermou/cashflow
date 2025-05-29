@@ -15,8 +15,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 export default function Page() {
   const [savedMonths, setSavedMonths] = useState(getSavedMonths());
 
-  const target = getTarget();
-
   const months = useMemo(() => {
     const yearMonths = getYearMonths();
 
@@ -28,6 +26,8 @@ export default function Page() {
       ),
     }));
   }, [savedMonths]);
+
+  const target = getTarget();
 
   const totalSaved = savedMonths.length * target;
 
