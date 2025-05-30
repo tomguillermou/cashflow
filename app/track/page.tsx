@@ -1,5 +1,9 @@
 "use client";
 
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { LuPen } from "react-icons/lu";
+
 import {
   getMonthName,
   getSavedMonths,
@@ -9,8 +13,6 @@ import {
   toMoney,
 } from "@/lib/utils";
 import { Month } from "@/types/month";
-import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function Page() {
   const [savedMonths, setSavedMonths] = useState(getSavedMonths());
@@ -60,12 +62,12 @@ export default function Page() {
     <main className="space-y-8">
       <h1 className="text-xl font-bold">Suivez votre épargne</h1>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-4 overflow-x-auto">
         {months.map(({ month, year, hasSaved, isCurrent }) => (
           <div key={`${month}-${year}`}>
             <div
               ref={isCurrent ? currentMonthRef : undefined}
-              className={`flex h-52 min-w-32 cursor-pointer flex-col items-center justify-center rounded border text-center shadow ${hasSaved ? "border-blue-500 bg-blue-200" : ""}`}
+              className={`flex h-52 w-32 cursor-pointer flex-col items-center justify-center rounded border text-center shadow ${hasSaved ? "border-blue-500 bg-blue-100" : ""}`}
               onClick={() => handleMonthClick({ month, year })}
             >
               <input
@@ -81,13 +83,12 @@ export default function Page() {
         ))}
       </div>
 
-      <div className="rounded border p-4 shadow">
-        <p>
-          Vous avez épargné <strong>{toMoney(totalSaved)}</strong> sur l&apos;année.
-        </p>
-      </div>
+      <p className="rounded bg-slate-100 p-4 shadow">
+        Vous avez épargné <strong>{toMoney(totalSaved)}</strong> sur l&apos;année.
+      </p>
 
       <Link href="/" className="btn">
+        <LuPen className="h-4 w-4" />
         Modifier mon objectif
       </Link>
     </main>

@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { LuArrowRight } from "react-icons/lu";
+
 import { getIncome, getRate, saveIncome, saveRate, saveTarget, toMoney } from "@/lib/utils";
 
 export default function Home() {
@@ -43,11 +45,9 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="rounded border p-4 shadow">
-        <p>
-          Votre objectif d&apos;épargne est de <strong>{toMoney(target)}</strong> / mois.
-        </p>
-      </div>
+      <p className="rounded bg-slate-100 p-4 shadow">
+        Votre objectif d&apos;épargne est de <strong>{toMoney(target)}</strong> / mois.
+      </p>
 
       <button
         className="btn btn-primary float-right"
@@ -59,7 +59,7 @@ export default function Home() {
         }}
         disabled={!income || !rate}
       >
-        Suivre mon épargne
+        Suivre mon épargne <LuArrowRight className="h-4 w-4" />
       </button>
     </main>
   );

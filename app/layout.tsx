@@ -1,7 +1,6 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Toaster } from "react-hot-toast";
 
 import { Analytics } from "@vercel/analytics/next";
 
@@ -15,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr-FR">
+    <html>
       <body>
         <div className="mx-auto max-w-lg p-8 md:px-0">
           <h1 className="mb-8 text-center text-2xl font-bold">Mon Petit Banquier</h1>
@@ -23,7 +22,6 @@ export default function RootLayout({
           {children}
         </div>
 
-        <Toaster position="bottom-right" reverseOrder={false} />
         <Analytics />
       </body>
     </html>
