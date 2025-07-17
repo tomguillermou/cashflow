@@ -15,9 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body>
-        <div className="mx-auto max-w-lg p-8 md:px-0">
-          <h1 className="mb-8 text-center text-2xl font-bold">Mon Petit Banquier</h1>
+      <body className="h-screen bg-neutral-100">
+        <div className="bg-base-100 flex h-screen max-w-xl flex-col gap-4 p-8">
+          <h1 className="text-center text-2xl font-bold">Mon Petit Banquier</h1>
 
           {children}
         </div>

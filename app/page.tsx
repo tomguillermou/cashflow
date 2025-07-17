@@ -1,66 +1,88 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { LuArrowRight } from "react-icons/lu";
-
-import { getIncome, getRate, saveIncome, saveRate, saveTarget, toMoney } from "@/lib/utils";
+import { euros } from "@/lib/utils";
+import { LuArrowRight, LuPen, LuPlus } from "react-icons/lu";
 
 export default function Home() {
-  const router = useRouter();
-  const [income, setIncome] = useState(getIncome());
-  const [rate, setRate] = useState(getRate(20));
+  const income = 4200;
+  const rate = 20;
 
-  const target = Number((income * (rate / 100)).toFixed(2));
+  const currentSecurityAmount = 3290;
+  const totalSecurityAmount = 6 * income * 0.7;
 
   return (
-    <main className="space-y-8">
-      <h1 className="text-xl font-bold">Définissez votre objectif d&apos;épargne</h1>
+    <main className="mt-8 flex flex-col gap-8">
+      <section className="flex flex-col gap-2">
+        <h2 className="text-lg font-bold">Mes informations</h2>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="income">Combien gagnez-vous par mois?</label>
-        <input
-          id="income"
-          className="input-bordered input w-full"
-          onChange={(e) => setIncome(Number(e.target.value))}
-          defaultValue={income}
-        />
-      </div>
+        <div className="flex gap-4">
+          <div className="bg-base-200 flex-1 rounded p-4">
+            <h2 className="text-neutral-500">Revenus mensuels nets</h2>
+            <p className="text-2xl font-bold">{euros(income)}</p>
+          </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="rate">Quel pourcentage de vos revenus voulez-vous épargner?</label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          className="range range-primary range-xs w-full"
-          onChange={(e) => setRate(Number(e.target.value))}
-          defaultValue={rate}
-        />
-        <div className="flex items-center gap-2">
-          <p>{rate}%</p>
-          {rate < 20 && <div className="badge badge-soft badge-warning">Bas</div>}
-          {rate >= 20 && rate <= 40 && <div className="badge badge-soft badge-success">Bon</div>}
-          {rate > 40 && <div className="badge badge-soft badge-success">Elevé</div>}
+          <div className="bg-base-200 flex-1 rounded p-4">
+            <h2 className="text-neutral-500">Taux d&apos;épargne</h2>
+            <p className="text-2xl font-bold">{rate}%</p>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <p className="rounded bg-slate-100 p-4 shadow">
-        Votre objectif d&apos;épargne est de <strong>{toMoney(target)}</strong> / mois.
-      </p>
+      <section className="flex flex-col gap-2">
+        <h2 className="text-lg font-bold">Mes objectifs</h2>
 
-      <button
-        className="btn btn-primary float-right"
-        onClick={() => {
-          saveIncome(income);
-          saveRate(rate);
-          saveTarget(target);
-          router.push("/track");
-        }}
-        disabled={!income || !rate}
-      >
-        Suivre mon épargne <LuArrowRight className="h-4 w-4" />
-      </button>
+        <div className="bg-base-200 rounded p-4">
+          <p>Ouvrir un compte Livret A</p>
+
+          <div className="flex justify-end">
+            <button className="btn btn-neutral btn-sm">
+              Se renseigner <LuArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-lg font-bold">Suivi</h2>
+
+        <div className="bg-base-200 space-y-4 rounded p-4">
+          <h2 className="text-neutral-500">Matelas de sécurité</h2>
+
+          <div className="flex items-center gap-4">
+            <div>
+              <p className="text-xl font-bold">{euros(currentSecurityAmount)}</p>
+              <p className="text-sm text-neutral-500">Montant actuel</p>
+            </div>
+            <LuArrowRight />
+            <div>
+              <p className="text-xl font-bold">{euros(totalSecurityAmount)}</p>
+              <p className="text-sm text-neutral-500">Objectif</p>
+            </div>
+          </div>
+
+          <progress
+            className="progress"
+            value={currentSecurityAmount}
+            max={totalSecurityAmount}
+          ></progress>
+
+          <div className="flex items-center justify-end">
+            <button className="btn btn-neutral btn-sm btn-outline">
+              Actualiser le montant <LuPen size={16} />
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-base-200 rounded p-4">
+          <p className="text-neutral-500">Vous avez un compte à ajouter?</p>
+
+          <div className="flex justify-end">
+            <button className="btn btn-neutral btn-sm btn-outline">
+              Ajouter un compte <LuPlus size={16} />
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
